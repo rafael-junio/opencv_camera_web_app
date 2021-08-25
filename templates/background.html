@@ -7,7 +7,11 @@
     {% if session['background_set'] == True  %}
       <img src="{{ url_for('background_render') }}" width="50%"/>
     {% else %}
-        <h2>Por favor, clique no botão abaixo para capturar o background e aguarde...</h2>
+        <h2>Instruções:</h2>
+        <h3>Clique no botão "Capturar background" para fazer um snapshot do fundo.</h3>
+        <h3>Para melhor efetividade, tire o snapshot somente do fundo e depois apareça na camera para visualizar o
+        fundo removido!</h3>
+
     {% endif %}
     <form method="post" action="/background">
       <button type="submit" class="btn btn-secondary" value="capturabg" name="capturabg">Capturar background!</button>

@@ -26,8 +26,11 @@ class AppPipeline:
         old_frame = self.background
         while True:
             _, frame = self.__get_frame()
-            mask = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            subtracted_frame = cv2.subtract(old_frame, frame, mask=mask)
+            mask = cv2.subtract(old_frame, frame)
+            mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+            mask = np.where(mask < 25, 0, 255)
+            mask = cv2.merge((mask, mask, mask))
+            subtracted_frame = np.where(mask == 0, 0, frame)
             ret, buffer = cv2.imencode('.jpg', subtracted_frame)
             encoded_frame = buffer.tobytes()
             if self.background is not None:
