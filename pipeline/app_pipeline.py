@@ -8,35 +8,68 @@ class AppPipeline:
         self.__open_camera()
         self.background = None
 
-    def __get_frame(self):
-        _, frame = self.camera.read()
-        return _, frame
-
-    def stream(self):
-        while True:
-            _, frame = self.__get_frame()
-            ret, buffer = cv2.imencode('.jpg', frame)
-            encoded_frame = buffer.tobytes()
-            yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + encoded_frame + b'\r\n\r\n'
-
-    def __open_camera(self):
-        self.camera = cv2.VideoCapture(0)
-
     def background_subtract(self):
         old_frame = self.background
         while True:
             _, frame = self.__get_frame()
-            mask = cv2.subtract(old_frame, frame)
-            mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-            mask = np.where(mask < 25, 0, 255)
+            mask = self.__extract_mask(frame, old_frame)
             mask = cv2.merge((mask, mask, mask))
             subtracted_frame = np.where(mask == 0, 0, frame)
-            ret, buffer = cv2.imencode('.jpg', subtracted_frame)
-            encoded_frame = buffer.tobytes()
             if self.background is not None:
-                yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + encoded_frame + b'\r\n\r\n'
-            else:
-                yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + b'\r\n\r\n'
+                yield self.__stream(subtracted_frame)
+            # else:
+            #     yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + b'\r\n\r\n'
+
+    def camera_render(self):
+        while True:
+            _, frame = self.__get_frame()
+            yield self.__stream(frame)
+
+    def binarize_frame(self):
+        while True:
+            _, frame = self.__get_frame()
+            binarized_frame = self.__binarize(frame, self.r, self.g, self.b, self.k)
+            yield self.__stream(binarized_frame)
 
     def set_background(self):
         _, self.background = self.__get_frame()
+
+    def set_binarize_values(self, r=1, g=1, b=1, k=328):
+        self.r = r
+        self.g = g
+        self.b = b
+        self.k = k
+
+    @staticmethod
+    def __binarize(frame, r, g, b, k):
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        binarized_frame = np.zeros((frame.shape[0], frame.shape[1]))
+        for i in range(frame.shape[0]):
+            for j in range(frame.shape[1]):
+                binarized_frame[i, j] = (frame[i, j, 0] * r + frame[i, j, 1] * g + frame[i, j, 0] * b) > k
+        binarized_frame = np.where(binarized_frame == 1, 0, 255)
+        return binarized_frame
+
+    @staticmethod
+    def __extract_mask(frame, old_frame):
+        mask = cv2.subtract(old_frame, frame)
+        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+        mask = np.where(mask < 25, 0, 255)
+        return mask
+
+    @staticmethod
+    def __encode_frame(frame):
+        ret, buffer = cv2.imencode('.jpg', frame)
+        encoded_frame = buffer.tobytes()
+        return encoded_frame
+
+    def __open_camera(self):
+        self.camera = cv2.VideoCapture(0)
+
+    def __get_frame(self):
+        _, frame = self.camera.read()
+        return _, frame
+
+    def __stream(self, frame):
+        encoded_frame = self.__encode_frame(frame)
+        return b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + encoded_frame + b'\r\n\r\n'

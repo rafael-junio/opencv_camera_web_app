@@ -5,7 +5,7 @@
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
   <h1 class="page-header">Removedor de background!</h1>
     {% if session['background_set'] == True  %}
-      <img src="{{ url_for('background_render') }}" width="50%"/>
+      <img src="{{ url_for('background_frame') }}" width="50%"/>
     {% else %}
         <h2>Instruções:</h2>
         <h3>Clique no botão "Capturar background" para fazer um snapshot do fundo.</h3>
