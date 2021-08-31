@@ -34,6 +34,26 @@ class AppPipeline:
     def set_background(self):
         _, self.background = self.__get_frame()
 
+    def crop_image(self):
+        _, frame = self.__get_frame()
+        self.__cache_cropped_image(frame)
+        marked_image = self.__mark_image(frame)
+        return self.__stream(marked_image)
+
+    def __mark_image(self, frame):
+        marked_image = cv2.rectangle(frame, (self.x, self.y), (self.dx, self.dy), color=(0, 255, 0), thickness=1)
+        return marked_image
+
+    def __cache_cropped_image(self, frame):
+        frame = frame[self.y:self.dy, self.x:self.dx]
+        cv2.imwrite('assets/cropped_image.jpg', frame)
+
+    def set_crop_values(self, x, y, dx, dy):
+        self.x = int(x)
+        self.y = int(y)
+        self.dx = int(dx)
+        self.dy = int(dy)
+
     def set_binarize_values(self, r=1, g=1, b=1, k=328):
         self.r = r
         self.g = g

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, request, session
+from flask import Flask, render_template, Response, request, session, send_file
 from pipeline.app_pipeline import AppPipeline
 
 app = Flask(__name__)
@@ -8,6 +8,18 @@ camera = AppPipeline()
 @app.route('/')
 def render_home() -> render_template:
     return render_template('index.html')
+
+
+@app.route('/crop', methods=['GET', 'POST'])
+def render_crop() -> render_template:
+    if request.method == 'POST' and request.form.get('x') and request.form.get('y') \
+            and request.form.get('dx') and request.form.get('dy'):
+        camera.set_crop_values(request.form.get('x'), request.form.get('y'),
+                               request.form.get('dx'), request.form.get('dy'))
+        session['crop_valid'] = True
+    if request.method == 'GET':
+        session['crop_valid'] = False
+    return render_template('crop.html')
 
 
 @app.route('/background', methods=['GET', 'POST'])
@@ -45,6 +57,21 @@ def camera_frame() -> Response:
 @app.route('/background_frame')
 def background_frame() -> Response:
     return Response(camera.background_subtract(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/crop_frame')
+def crop_frame() -> Response:
+    return Response(camera.camera_render(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/freezed_frame')
+def freezed_frame() -> Response:
+    return Response(camera.crop_image(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/download_cropped_image', methods=['POST'])
+def download_cropped_image():
+    return send_file('assets/cropped_image.jpg', as_attachment=True)
 
 
 if __name__ == '__main__':
