@@ -43,10 +43,18 @@ def render_binarize() -> render_template:
         camera.set_binarize_values()
     return render_template('binarize.html')
 
+@app.route('/detect_faces')
+def render_detect_faces() -> render_template:
+    return render_template('detect_faces.html')
 
 @app.route('/binarize_frame', methods=['GET', 'POST'])
 def binarize_frame() -> Response:
     return Response(camera.binarize_frame(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/detect_faces_frame', methods=['GET', 'POST'])
+def detect_faces_frame() -> Response:
+    return Response(camera.detect_faces(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/camera_frame')

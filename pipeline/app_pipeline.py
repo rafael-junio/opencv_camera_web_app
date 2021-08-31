@@ -34,15 +34,25 @@ class AppPipeline:
     def set_background(self):
         _, self.background = self.__get_frame()
 
+    def detect_faces(self):
+        cascade_classifier = cv2.CascadeClassifier('pipeline/models/haarcascade_frontalface_default.xml')
+        while True:
+            _, frame = self.__get_frame()
+            frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            detected_faces = cascade_classifier.detectMultiScale(frame_gray, 1.2, 6)
+            for x, y, w, h in detected_faces:
+                frame = self.__draw_retangle(frame, x, y, x+w, y+h, thickness=2)
+            yield self.__stream(frame)
+
     def crop_image(self):
         _, frame = self.__get_frame()
         self.__cache_cropped_image(frame)
-        marked_image = self.__mark_image(frame)
+        marked_image = self.__draw_retangle(frame, self.x, self.y, self.dx, self.dy)
         return self.__stream(marked_image)
 
-    def __mark_image(self, frame):
-        marked_image = cv2.rectangle(frame, (self.x, self.y), (self.dx, self.dy), color=(0, 255, 0), thickness=1)
-        return marked_image
+    def __draw_retangle(self, frame, x, y, dx, dy, color=(0, 255, 0), thickness=1):
+        drawed_frame = cv2.rectangle(frame, (x, y), (dx, dy), color=color, thickness=thickness)
+        return drawed_frame
 
     def __cache_cropped_image(self, frame):
         frame = frame[self.y:self.dy, self.x:self.dx]
