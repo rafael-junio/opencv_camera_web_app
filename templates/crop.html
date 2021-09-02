@@ -8,7 +8,7 @@
     {% if session['crop_valid'] == True %}
     <img id="id_image" src="{{ url_for('freezed_frame') }}" width="50%"/>
     <form method="post" action="/download_cropped_image">
-        <button type="submit" class="btn btn-secondary">Download da imagem cropada!</button>
+        <button type="submit" class="btn btn-secondary" style="margin: 10px 5px;">Download da imagem cropada!</button>
     </form>
     {% else %}
     <img id="id_image_crop" src="{{ url_for('crop_frame') }}" width="50%"/>
