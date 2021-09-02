@@ -6,15 +6,15 @@
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h1 class="page-header">Crop</h1>
     {% if session['crop_valid'] == True %}
-    <img id="id_image" src="{{ url_for('freezed_frame') }}" width="50%"/>
+    <img id="id_image" src="{{ url_for('freezed_frame') }}" width="50%" style="margin-left: 20em"/>
     <form method="post" action="/download_cropped_image">
         <button type="submit" class="btn btn-secondary" style="margin: 10px 5px;">Download da imagem cropada!</button>
     </form>
     {% else %}
-    <img id="id_image_crop" src="{{ url_for('crop_frame') }}" width="50%"/>
+    <img id="id_image_crop" src="{{ url_for('crop_frame') }}" width="50%" style="margin-left: 20em"/>
     <form method="post" action="/crop" class="form-inline">
         <div class="form-group">
-            <input name="x" type="text" class="col-lg-1" placeholder="X" style="margin: 10px 5px;">
+            <input name="x" type="text" class="col-lg-1" placeholder="X" style="margin: 10px 5px auto 20em;">
             <input name="y" type="text" class="col-lg-1" placeholder="Y" style="margin: 10px 5px;">
             <input name="dx" type="text" class="col-lg-1" placeholder="DX" style="margin: 10px 5px;">
             <input name="dy" type="text" class="col-lg-1" placeholder="DY" style="margin: 10px 5px;">

@@ -5,11 +5,11 @@
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h1 class="page-header">Binarizador!</h1>
-    <img src="{{ url_for('binarize_frame') }}" width="50%"/>
+    <img src="{{ url_for('binarize_frame') }}" width="50%" style="margin-left: 20em"/>
 
     <form method="post" action="/binarize" class="form-inline">
         <div class="form-group">
-            <input name="red" type="text" class="col-lg-1" placeholder="R" style="margin: 10px 5px;">
+            <input name="red" type="text" class="col-lg-1" placeholder="R" style="margin: 10px 5px auto 20em;;">
             <input name="green" type="text" class="col-lg-1" placeholder="G" style="margin: 10px 5px;">
             <input name="blue" type="text" class="col-lg-1" placeholder="B" style="margin: 10px 5px;">
             <input name="k" type="text" class="col-lg-1" placeholder="K" style="margin: 10px 5px;">
